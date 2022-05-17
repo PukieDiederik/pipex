@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "libft.h"
+#include <wait.h>
 
 void clear_split(char **split)
 {
@@ -57,47 +58,43 @@ char *get_path(char *cmd, char **envp)
 	return (0);
 }
 
-void parent_process(int *p, char **envp)
-{
-	close(p[1]);
-	dup2(*p, STDIN_FILENO);
-
-	char str[] = "wc";
-	char **ls = malloc(sizeof (char *));
-	*ls = str;
-	execve("/usr/bin/wc", ls, envp);
-	free(ls);
-	close(p[0]);
-}
-
-void child_process(int *p, char **envp)
-{
-	close(p[0]);
-	dup2(p[1], STDOUT_FILENO);
-
-	char str[] = "ls";
-	char **ls = malloc(sizeof (char *));
-	*ls = str;
-	execve("/bin/ls", ls, envp);
-	free(ls);
-	close(p[1]);
-}
-
 int main(int argc, char **argv, char **envp)
 {
-	int p[2];
-	pipe(p);
+	int id;
+	int i = 1;
 
-	if (argc != 5)
+	if (argc < 4)
 		exit(0);
-	printf("%s", get_path(argv[2], envp));
-//	int id = fork();
-//	if (id < 0)
-//		exit(1);
-//	else if (id == 0)
-//		child_process(p, envp);
-//	else {
-//		wait(0);
-//		parent_process(p, envp);
-//	}
+	while (++i < argc - 1)
+	{
+		int p[2];
+		pipe(p);
+		char **child_argv = ft_split(argv[i], ' ');
+		char *child_command = get_path(child_argv[0], envp);
+		if (!child_command)
+			exit(0);
+		id = fork();
+		if (id < 0)
+			exit(1);
+		if (id == 0)
+		{
+			if (i != argc - 2)
+			{
+				dup2(p[1], STDOUT_FILENO);
+				close(p[1]);
+			}
+			else
+				close(p[1]);
+			execve(child_command, child_argv, envp);
+		}
+		else {
+			waitpid(id, NULL, 0);
+			dup2(p[0], STDIN_FILENO);
+			close(p[0]);
+			close(p[1]);
+			clear_split(child_argv);
+			free(child_command);
+			fflush(stdout);
+		}
+	}
 }
