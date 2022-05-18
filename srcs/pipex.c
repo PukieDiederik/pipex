@@ -27,10 +27,10 @@ void	execute(char *cmd, char **envp)
 
 	argv = ft_split(cmd, ' ');
 	if (!argv)
-		print_error(5, "Command splitting went wrong");
+		print_error(5, "Command splitting went wrong\n");
 	program = get_path(argv[0], envp);
 	if (!program)
-		print_error(5, "Could not find/create path");
+		print_error(5, "Could not find/create path\n");
 	execve(program, argv, envp);
 	clear_split(argv);
 	free(program);
@@ -43,7 +43,7 @@ void	parent(int *p)
 
 	wait(&status);
 	if (WIFEXITED(status) && WEXITSTATUS(status))
-		print_error(2, "Program did not execute correctly");
+		print_error(2, "Program did not execute correctly\n");
 	dup2(p[0], STDIN_FILENO);
 	close(p[0]);
 	close(p[1]);
@@ -58,7 +58,7 @@ void	set_fds(int i, int argc, char **argv, int *p)
 		close(p[0]);
 		fd = open(argv[1], O_RDONLY);
 		if (fd < 0)
-			print_error(6, "Could not open infile for reading");
+			print_error(6, "Could not open infile for reading\n");
 		dup2(fd, STDIN_FILENO);
 		close(fd);
 	}
@@ -70,7 +70,7 @@ void	set_fds(int i, int argc, char **argv, int *p)
 	{
 		fd = open (argv[argc - 1], O_WRONLY);
 		if (fd < 0)
-			print_error(6, "Could not open outfile for reading");
+			print_error(6, "Could not open outfile for reading\n");
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
 	}
@@ -79,7 +79,7 @@ void	set_fds(int i, int argc, char **argv, int *p)
 
 void	print_error(int errno, char *errstr)
 {
-	write(1, errstr, ft_strlen(errstr));
+	write(2, errstr, ft_strlen(errstr));
 	exit(errno);
 }
 
@@ -90,16 +90,16 @@ int	main(int argc, char **argv, char **envp)
 	int	p[2];
 
 	if (argc < 5)
-		print_error(3, "Not enough arguments");
+		print_error(3, "Not enough arguments\n");
 	if (access(argv[1], R_OK) | access(argv[argc - 1], R_OK))
-		print_error(4, "Infile or outfile does not exist or cannot be read");
+		print_error(4, "Infile or outfile does not exist or cannot be read\n");
 	i = 1;
 	while (++i < argc - 1)
 	{
 		pipe(p);
 		id = fork();
 		if (id < 0)
-			print_error(1, "Fork failed");
+			print_error(1, "Fork failed\n");
 		if (id == 0)
 		{
 			set_fds(i, argc, argv, p);
