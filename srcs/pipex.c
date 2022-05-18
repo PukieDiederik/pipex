@@ -2,7 +2,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "libft.h"
-#include <wait.h>
+#include <sys/wait.h>
+#include <sys/fcntl.h>
 
 void clear_split(char **split)
 {
@@ -64,7 +65,9 @@ int main(int argc, char **argv, char **envp)
 	int i = 1;
 
 	if (argc < 4)
-		exit(0);
+		exit(1);
+	if (access(argv[1], F_OK | R_OK) | access(argv[argc - 1], F_OK | R_OK))
+		exit(2);
 	while (++i < argc - 1)
 	{
 		int p[2];
@@ -72,19 +75,29 @@ int main(int argc, char **argv, char **envp)
 		char **child_argv = ft_split(argv[i], ' ');
 		char *child_command = get_path(child_argv[0], envp);
 		if (!child_command)
-			exit(0);
+			exit(3);
 		id = fork();
 		if (id < 0)
-			exit(1);
+			exit(4);
 		if (id == 0)
 		{
+			if (i == 2)
+			{
+				int fd = open(argv[1], O_RDONLY);
+				dup2(fd, STDIN_FILENO);
+				close(fd);
+			}
 			if (i != argc - 2)
 			{
 				dup2(p[1], STDOUT_FILENO);
-				close(p[1]);
 			}
 			else
-				close(p[1]);
+			{
+				int fd = open (argv[argc - 1], O_WRONLY);
+				dup2(fd, STDOUT_FILENO);
+				close(fd);
+			}
+			close(p[1]);
 			execve(child_command, child_argv, envp);
 		}
 		else {
@@ -94,7 +107,6 @@ int main(int argc, char **argv, char **envp)
 			close(p[1]);
 			clear_split(child_argv);
 			free(child_command);
-			fflush(stdout);
 		}
 	}
 }

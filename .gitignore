@@ -5,6 +5,9 @@ libft/*.a
 libft/*.o
 pipex
 
+infile
+outfile
+
 #ignore editor files
 .vscode
 .idea
