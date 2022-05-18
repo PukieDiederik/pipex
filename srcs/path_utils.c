@@ -51,10 +51,10 @@ char	*get_path(char *cmd, char **envp)
 	while (*envp && !ft_strnstr(*envp, "PATH=", 5))
 		envp++;
 	paths = ft_split((*envp) + 5, ':');
-	if (!paths)
+	if (!paths || !cmd)
 		return (0);
 	i = 0;
-	while (paths[i] != 0)
+	while (paths[i])
 	{
 		path = create_path_str(paths[i], cmd);
 		if (path && !access(path, X_OK))

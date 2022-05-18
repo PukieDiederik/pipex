@@ -26,7 +26,7 @@ void	execute(char *cmd, char **envp)
 	char	*program;
 
 	argv = ft_split(cmd, ' ');
-	if (!argv)
+	if (!argv || !argv[0])
 		print_error(5, "Command splitting went wrong\n");
 	program = get_path(argv[0], envp);
 	if (!program)
