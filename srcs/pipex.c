@@ -15,11 +15,12 @@ void clear_split(char **split)
 	free(split);
 }
 
-char *create_path_str(char *path, char *cmd)
+char	*create_path_str(char *path, char *cmd)
 {
-	char *str;
-	int i = 0;
+	char	*str;
+	int		i;
 
+	i = 0;
 	str = malloc((ft_strlen(path) + ft_strlen(cmd) + 2) * sizeof(char));
 	if (!str)
 		return (0);
@@ -34,20 +35,21 @@ char *create_path_str(char *path, char *cmd)
 
 char *get_path(char *cmd, char **envp)
 {
-	char **paths;
-	int i;
-	char *path;
+	char	**paths;
+	char	*path;
+	int		i;
 
 	while(*envp && !ft_strnstr(*envp, "PATH=", 5))
 		envp++;
 	paths = ft_split((*envp) + 5, ':');
+	if (!paths)
+		return (0);
 	i = 0;
 	while (paths[i] != 0)
 	{
 		path = create_path_str(paths[i], cmd);
-		if(!access(path, F_OK))
+		if(path && !access(path, X_OK))
 		{
-			i = 0;
 			clear_split(paths);
 			return (path);
 		}
@@ -62,12 +64,15 @@ char *get_path(char *cmd, char **envp)
 void execute(char *cmd, char **envp)
 {
 	char **argv = ft_split(cmd, ' ');
+	if (!argv)
+		exit(3);
 	char *program = get_path(argv[0], envp);
 	if (!program)
 		exit(3);
 	execve(program, argv, envp);
 	clear_split(argv);
 	free(program);
+	exit(4);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -77,7 +82,7 @@ int main(int argc, char **argv, char **envp)
 
 	if (argc < 4)
 		exit(1);
-	if (access(argv[1], F_OK | R_OK) | access(argv[argc - 1], F_OK | R_OK))
+	if (access(argv[1], R_OK) | access(argv[argc - 1], R_OK))
 		exit(2);
 	while (++i < argc - 1)
 	{
