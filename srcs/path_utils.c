@@ -14,7 +14,7 @@
 #include "pipex.h"
 #include <stdlib.h>
 
-char	*create_path_str(char *path, char *cmd)
+static char	*create_path_str(char *path, char *cmd)
 {
 	char	*str;
 	int		i;
