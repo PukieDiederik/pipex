@@ -87,7 +87,6 @@ int	main(int argc, char **argv, char **envp)
 {
 	int	id;
 	int	i;
-	int	status;
 	int	p[2];
 
 	if (argc < 5)
