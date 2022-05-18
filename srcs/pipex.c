@@ -20,16 +20,6 @@
 
 void	print_error(int errno, char *errstr);
 
-void	clear_split(char **split)
-{
-	int	i;
-
-	i = 0;
-	while (split[i])
-		free(split[i++]);
-	free(split);
-}
-
 void	execute(char *cmd, char **envp)
 {
 	char	**argv;
@@ -45,6 +35,18 @@ void	execute(char *cmd, char **envp)
 	clear_split(argv);
 	free(program);
 	exit(2);
+}
+
+void	parent(int *p)
+{
+	int	status;
+
+	wait(&status);
+	if (WIFEXITED(status) && WEXITSTATUS(status))
+		print_error(2, "Program did not execute correctly");
+	dup2(p[0], STDIN_FILENO);
+	close(p[0]);
+	close(p[1]);
 }
 
 void	set_fds(int i, int argc, char **argv, int *p)
@@ -105,13 +107,6 @@ int	main(int argc, char **argv, char **envp)
 			execute(argv[i], envp);
 		}
 		else
-		{
-			wait(&status);
-			if (WIFEXITED(status) && WEXITSTATUS(status))
-				print_error(2, "Program did not execute correctly");
-			dup2(p[0], STDIN_FILENO);
-			close(p[0]);
-			close(p[1]);
-		}
+			parent(p);
 	}
 }

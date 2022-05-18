@@ -14,6 +14,16 @@
 #include "pipex.h"
 #include <stdlib.h>
 
+void	clear_split(char **split)
+{
+	int	i;
+
+	i = 0;
+	while (split[i])
+		free(split[i++]);
+	free(split);
+}
+
 static char	*create_path_str(char *path, char *cmd)
 {
 	char	*str;
