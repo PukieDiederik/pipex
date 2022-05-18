@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: drobert- <drobert-@student.42lisboa.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/18 13:55:00 by drobert-          #+#    #+#             */
+/*   Updated: 2022/05/18 13:55:10 by drobert-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,11 +18,11 @@
 #include <sys/wait.h>
 #include <sys/fcntl.h>
 
-void print_error(int errno, char *errstr);
+void	print_error(int errno, char *errstr);
 
-void clear_split(char **split)
+void	clear_split(char **split)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (split[i])
@@ -18,12 +30,15 @@ void clear_split(char **split)
 	free(split);
 }
 
-void execute(char *cmd, char **envp)
+void	execute(char *cmd, char **envp)
 {
-	char **argv = ft_split(cmd, ' ');
+	char	**argv;
+	char	*program;
+
+	argv = ft_split(cmd, ' ');
 	if (!argv)
 		print_error(5, "Command splitting went wrong");
-	char *program = get_path(argv[0], envp);
+	program = get_path(argv[0], envp);
 	if (!program)
 		print_error(5, "Could not find/create path");
 	execve(program, argv, envp);
@@ -32,9 +47,9 @@ void execute(char *cmd, char **envp)
 	exit(2);
 }
 
-void set_fds(int i, int argc, char **argv, int *p)
+void	set_fds(int i, int argc, char **argv, int *p)
 {
-	int fd;
+	int	fd;
 
 	if (i == 2)
 	{
@@ -42,7 +57,7 @@ void set_fds(int i, int argc, char **argv, int *p)
 		fd = open(argv[1], O_RDONLY);
 		if (fd < 0)
 			print_error(6, "Could not open infile for reading");
-			dup2(fd, STDIN_FILENO);
+		dup2(fd, STDIN_FILENO);
 		close(fd);
 	}
 	if (i != argc - 2)
@@ -60,17 +75,18 @@ void set_fds(int i, int argc, char **argv, int *p)
 	close(p[1]);
 }
 
-void print_error(int errno, char *errstr)
+void	print_error(int errno, char *errstr)
 {
 	write(1, errstr, ft_strlen(errstr));
 	exit(errno);
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-	int id;
-	int i;
-	int status;
+	int	id;
+	int	i;
+	int	status;
+	int	p[2];
 
 	if (argc < 5)
 		print_error(3, "Not enough arguments");
@@ -79,7 +95,6 @@ int main(int argc, char **argv, char **envp)
 	i = 1;
 	while (++i < argc - 1)
 	{
-		int p[2];
 		pipe(p);
 		id = fork();
 		if (id < 0)
@@ -89,7 +104,8 @@ int main(int argc, char **argv, char **envp)
 			set_fds(i, argc, argv, p);
 			execute(argv[i], envp);
 		}
-		else {
+		else
+		{
 			wait(&status);
 			if (WIFEXITED(status) && WEXITSTATUS(status))
 				print_error(2, "Program did not execute correctly");
