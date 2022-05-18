@@ -1,6 +1,6 @@
 ## File stuff
 
-FNAMES 		=	pipex.c
+FNAMES 		=	pipex.c path_utils.c
 
 HNAMES		=	pipex.h
 
