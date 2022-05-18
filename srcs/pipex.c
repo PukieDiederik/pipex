@@ -59,6 +59,17 @@ char *get_path(char *cmd, char **envp)
 	return (0);
 }
 
+void execute(char *cmd, char **envp)
+{
+	char **argv = ft_split(cmd, ' ');
+	char *program = get_path(argv[0], envp);
+	if (!program)
+		exit(3);
+	execve(program, argv, envp);
+	clear_split(argv);
+	free(program);
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	int id;
@@ -72,10 +83,6 @@ int main(int argc, char **argv, char **envp)
 	{
 		int p[2];
 		pipe(p);
-		char **child_argv = ft_split(argv[i], ' ');
-		char *child_command = get_path(child_argv[0], envp);
-		if (!child_command)
-			exit(3);
 		id = fork();
 		if (id < 0)
 			exit(4);
@@ -98,15 +105,13 @@ int main(int argc, char **argv, char **envp)
 				close(fd);
 			}
 			close(p[1]);
-			execve(child_command, child_argv, envp);
+			execute(argv[i], envp);
 		}
 		else {
 			waitpid(id, NULL, 0);
 			dup2(p[0], STDIN_FILENO);
 			close(p[0]);
 			close(p[1]);
-			clear_split(child_argv);
-			free(child_command);
 		}
 	}
 }
