@@ -6,7 +6,7 @@
 /*   By: drobert- <drobert-@student.42lisboa.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 13:55:00 by drobert-          #+#    #+#             */
-/*   Updated: 2022/05/18 13:55:10 by drobert-         ###   ########.fr       */
+/*   Updated: 2022/05/23 02:36:55 by drobert-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@
 #include "pipex.h"
 #include <sys/wait.h>
 #include <sys/fcntl.h>
-
-void	print_error(int errno, char *errstr);
 
 void	execute(char *cmd, char **envp)
 {
@@ -42,8 +40,6 @@ void	parent(int *p)
 	int	status;
 
 	wait(&status);
-	if (WIFEXITED(status) && WEXITSTATUS(status))
-		print_error(2, "Program did not execute correctly\n");
 	dup2(p[0], STDIN_FILENO);
 	close(p[0]);
 	close(p[1]);

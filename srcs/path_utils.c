@@ -6,13 +6,14 @@
 /*   By: drobert- <drobert-@student.42lisboa.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 13:49:05 by drobert-          #+#    #+#             */
-/*   Updated: 2022/05/18 13:49:47 by drobert-         ###   ########.fr       */
+/*   Updated: 2022/05/23 02:39:39 by drobert-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 void	clear_split(char **split)
 {
@@ -50,6 +51,8 @@ char	*get_path(char *cmd, char **envp)
 
 	while (*envp && !ft_strnstr(*envp, "PATH=", 5))
 		envp++;
+	if (!access(cmd, F_OK))
+		return (ft_strdup(cmd));
 	paths = ft_split((*envp) + 5, ':');
 	if (!paths || !cmd)
 		return (0);
@@ -65,7 +68,6 @@ char	*get_path(char *cmd, char **envp)
 		free(path);
 		i++;
 	}
-	i = 0;
 	clear_split(paths);
 	return (0);
 }
