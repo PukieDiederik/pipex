@@ -6,7 +6,7 @@
 /*   By: drobert- <drobert-@student.42lisboa.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 13:55:00 by drobert-          #+#    #+#             */
-/*   Updated: 2022/05/23 02:36:55 by drobert-         ###   ########.fr       */
+/*   Updated: 2022/05/23 13:58:18 by drobert-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ void	parent(int *p)
 	int	status;
 
 	wait(&status);
+	if (status)
+		exit(8);
 	dup2(p[0], STDIN_FILENO);
 	close(p[0]);
 	close(p[1]);
