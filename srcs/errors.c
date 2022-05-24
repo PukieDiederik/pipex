@@ -27,6 +27,6 @@ void	error(void)
 
 void	err_bad_args(void)
 {
-	ft_putstr_fd("\033[31mError: Wrong amount ofarguments", 2);
+	ft_putstr_fd("\033[31mError: Wrong amount of arguments", 2);
 	exit(1);
 }

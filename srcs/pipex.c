@@ -66,7 +66,7 @@ void	set_fds(int i, int argc, char **argv, int *p)
 	}
 	else
 	{
-		fd = open (argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT);
+		fd = open (argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0666);
 		if (fd < 0)
 			error();
 		dup2(fd, STDOUT_FILENO);
