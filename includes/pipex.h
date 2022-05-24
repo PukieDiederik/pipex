@@ -17,5 +17,7 @@
 char	*get_path(char *cmd, char **envp);
 void	clear_split(char **split);
 void	print_error(int errno, char *errstr);
+void	err_bad_args(void);
+void	error(void);
 
 #endif

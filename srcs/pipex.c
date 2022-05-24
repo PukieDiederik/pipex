@@ -25,10 +25,10 @@ void	execute(char *cmd, char **envp)
 
 	argv = ft_split(cmd, ' ');
 	if (!argv || !argv[0])
-		print_error(5, "Command splitting went wrong\n");
+		error();
 	program = get_path(argv[0], envp);
 	if (!program)
-		print_error(5, "Could not find/create path\n");
+		print_error(5, "\033[31mCommand not found\n");
 	execve(program, argv, envp);
 	clear_split(argv);
 	free(program);
@@ -41,7 +41,7 @@ void	parent(int *p)
 
 	wait(&status);
 	if (status)
-		exit(8);
+		exit(status);
 	dup2(p[0], STDIN_FILENO);
 	close(p[0]);
 	close(p[1]);
@@ -56,7 +56,7 @@ void	set_fds(int i, int argc, char **argv, int *p)
 		close(p[0]);
 		fd = open(argv[1], O_RDONLY);
 		if (fd < 0)
-			print_error(6, "Could not open infile for reading\n");
+			error();
 		dup2(fd, STDIN_FILENO);
 		close(fd);
 	}
@@ -66,19 +66,13 @@ void	set_fds(int i, int argc, char **argv, int *p)
 	}
 	else
 	{
-		fd = open (argv[argc - 1], O_WRONLY);
+		fd = open (argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT);
 		if (fd < 0)
-			print_error(6, "Could not open outfile for reading\n");
+			error();
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
 	}
 	close(p[1]);
-}
-
-void	print_error(int errno, char *errstr)
-{
-	write(2, errstr, ft_strlen(errstr));
-	exit(errno);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -88,9 +82,9 @@ int	main(int argc, char **argv, char **envp)
 	int	p[2];
 
 	if (argc < 5)
-		print_error(3, "Not enough arguments\n");
+		err_bad_args();
 	if (access(argv[1], R_OK) | access(argv[argc - 1], R_OK))
-		print_error(4, "Infile or outfile does not exist or cannot be read\n");
+		error();
 	i = 1;
 	while (++i < argc - 1)
 	{
