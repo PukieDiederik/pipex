@@ -37,11 +37,6 @@ void	execute(char *cmd, char **envp)
 
 void	parent(int *p)
 {
-	int	status;
-
-	wait(&status);
-	if (status)
-		exit(status);
 	dup2(p[0], STDIN_FILENO);
 	close(p[0]);
 	close(p[1]);
@@ -91,7 +86,7 @@ int	main(int argc, char **argv, char **envp)
 		pipe(p);
 		id = fork();
 		if (id < 0)
-			print_error(1, "Fork failed\n");
+			error();
 		if (id == 0)
 		{
 			set_fds(i, argc, argv, p);
