@@ -83,7 +83,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc < 5)
 		err_bad_args();
-	if (access(argv[1], R_OK) | access(argv[argc - 1], R_OK))
+	if (access(argv[1], R_OK))
 		error();
 	i = 1;
 	while (++i < argc - 1)
